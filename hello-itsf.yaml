@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-itsf
+  labels:
+    app: hello-itsf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-itsf
+  template:
+    metadata:
+      labels:
+        app: hello-itsf
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+      containers:
+      - name: hello-itsf
+        image: nginx:1.25-alpine
+        ports:
+        - containerPort: 80
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 101
+          runAsGroup: 101
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: html-storage
+          mountPath: /usr/share/nginx/html
+        - name: var-cache-nginx
+          mountPath: /var/cache/nginx
+        - name: var-run
+          mountPath: /var/run
+      volumes:
+      - name: html-storage
+        persistentVolumeClaim:
+          claimName: html-pvc
+      - name: var-cache-nginx
+        emptyDir: {}
+      - name: var-run
+        emptyDir: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-itsf
+spec:
+  selector:
+    app: hello-itsf
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

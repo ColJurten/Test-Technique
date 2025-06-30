@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-risf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-risf
+  template:
+    metadata:
+      labels:
+        app: hello-risf
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+        - name: hello-risf
+          image: coljurten/hello-risf:0.0.1
+          ports:
+            - containerPort: 80
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+          - name: var-cache-nginx
+            mountPath: /var/cache/nginx
+          - name: var-run
+            mountPath: /var/run
+      volumes:
+      - name: var-cache-nginx
+        emptyDir: {}
+      - name: var-run
+        emptyDir: {}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-risf
+spec:
+  selector:
+    app: hello-risf
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

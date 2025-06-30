@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: html-content
+data:
+  index.html: |
+    <html>
+      <body>
+          HELLO ITSF
+      </body>
+    </html>
+
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: html-setup
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: copy-html
+        image: busybox:1.35
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "Copying HTML file to persistent volume..."
+          cp /tmp/html/index.html /html-data/
+          chown 101:101 /html-data/index.html
+          chmod 644 /html-data/index.html
+          echo "HTML file copied successfully with proper permissions"
+          ls -la /html-data/
+        volumeMounts:
+        - name: html-source
+          mountPath: /tmp/html
+        - name: html-storage
+          mountPath: /html-data
+      containers:
+      - name: completion
+        image: busybox:1.35
+        command: ['sh', '-c', 'echo "Setup complete"']
+      restartPolicy: Never
+      volumes:
+      - name: html-source
+        configMap:
+          name: html-content
+      - name: html-storage
+        persistentVolumeClaim:
+          claimName: html-pvc
