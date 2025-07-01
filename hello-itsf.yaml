@@ -23,7 +23,7 @@ spec:
       - name: hello-itsf
         image: nginx:1.25-alpine
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         securityContext:
           runAsNonRoot: true
           runAsUser: 101
@@ -61,4 +61,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 8080
