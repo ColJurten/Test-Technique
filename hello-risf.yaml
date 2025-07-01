@@ -21,7 +21,7 @@ spec:
         - name: hello-risf
           image: coljurten/hello-risf:0.0.1
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           securityContext:
             runAsNonRoot: true
             runAsUser: 1001
@@ -53,4 +53,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 8080
