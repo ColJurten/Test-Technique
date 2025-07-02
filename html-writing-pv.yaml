@@ -25,17 +25,17 @@ spec:
         command: ['sh', '-c']
         args:
         - |
-          echo "Copying HTML file to persistent volume..."
+          echo "Setting up HTML content in persistent volume..."
+          chown 101:101 /html-data
+          chmod 755 /html-data
           cp /tmp/html/index.html /html-data/
           chown 101:101 /html-data/index.html
           chmod 644 /html-data/index.html
-          echo "HTML file copied successfully with proper permissions"
+          echo "HTML content setup complete with proper permissions"
+          echo "Directory permissions:"
           ls -la /html-data/
-        volumeMounts:
-        - name: html-source
-          mountPath: /tmp/html
-        - name: html-storage
-          mountPath: /html-data
+          echo "Directory ownership:"
+          ls -ld /html-data/
       containers:
       - name: completion
         image: busybox:1.35
