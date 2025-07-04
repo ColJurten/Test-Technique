@@ -26,9 +26,10 @@ spec:
         args:
         - |
           echo "Setting up HTML content in persistent volume..."
+          mkdir -p /html-data
           chown 101:101 /html-data
           chmod 755 /html-data
-          cp /tmp/html/index.html /html-data/
+          cp /html-source/index.html /html-data/
           chown 101:101 /html-data/index.html
           chmod 644 /html-data/index.html
           echo "HTML content setup complete with proper permissions"
@@ -36,10 +37,18 @@ spec:
           ls -la /html-data/
           echo "Directory ownership:"
           ls -ld /html-data/
+        volumeMounts:
+        - name: html-source
+          mountPath: /html-source
+        - name: html-storage
+          mountPath: /html-data
       containers:
       - name: completion
         image: busybox:1.35
         command: ['sh', '-c', 'echo "Setup complete"']
+        volumeMounts:
+        - name: html-storage
+          mountPath: /html-data
       restartPolicy: Never
       volumes:
       - name: html-source
