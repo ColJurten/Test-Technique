@@ -107,7 +107,6 @@ openssl x509 -req -in csr/domains.csr -CA ca/ca-cert.pem -CAkey ca/ca-key.pem -C
 
 # Vérification et affichage des informations du certificat
 ```bash
-openssl x509 -in certs/domains-cert.pem -text -noout | grep -A 5 "Subject Alternative Name"
 openssl verify -CAfile ca/ca-cert.pem certs/domains-cert.pem
 ```
 
@@ -137,3 +136,19 @@ Une fois dans l'éditeur du fichier "hosts" ajoutez les lignes puis sauvegarder:
 <<VOTRENODEIP>>    hello-itsf.local.domain
 
 Vous pouvez désormais accéder au contenu des deux microservices déployés en utilisant les domaines dans votre navigateur web.
+
+### Commandes Utiles
+
+À utiliser lors d'un restart du cluster :
+```bash
+kubectl delete job html-setup
+kubectl apply -f html-writing-pv.yaml
+kubectl logs job/html-setup -c copy-html
+kubectl rollout restart deployment hello-itsf
+```
+
+À utiliser pour vérifier les UID des déploiements :
+```bash
+kubectl exec deploy/hello-itsf -- id
+kubectl exec deploy/hello-risf -- id
+```
